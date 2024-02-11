@@ -1,12 +1,15 @@
 import React, { useState } from "react";
 import axios from "axios";
+import Swal from 'sweetalert2'
+import cherry from './images/cherry.mp4'
+
 
 const Career = () => {
   const [formData, setFormData] = useState({
     name: "",
     email: "",
     phone: "",
-    Gender: "",
+    gender: "",
     address: "",
     college: "",
     education: "",
@@ -15,31 +18,78 @@ const Career = () => {
     state: "",
     role: "",
     experience: "",
-    comment: ""
   });
+
+
 
   const handleChange = (e) => {
     const { name, value } = e.target;
     setFormData({ ...formData, [e.target.name]: e.target.value });
   };
 
-  
 
-// 
-  const handleSubmit = () => {
-    const { name, email, phone, Gender, address, college, education, DOB, skills, state,role, experience, comment} = formData
-    if (name && email && phone && Gender && address && college && education && DOB && skills && state && role && experience && comment) {
-      axios.post("http://localhost:5000/submitForm", formData)
-       .then((res) => console.log(res));  
-    } else {
-      alert("Fill details")
+
+  // 
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+    const { name, email, phone, gender, address, college, education, DOB, skills, state, role, experience } = formData;
+
+    try {
+      if (name && email && phone && gender && address && college && education && DOB && skills && state && role && experience) {
+        // Make the axios post request
+        await axios.post("http://localhost:5000/submitForm", formData);
+
+        // If the request is successful, clear the form fields
+        setFormData({
+          name: "",
+          email: "",
+          phone: "",
+          gender: "",
+          address: "",
+          college: "",
+          education: "",
+          DOB: "",
+          skills: "",
+          state: "",
+          role: "",
+          experience: "",
+        });
+
+        // Show success message and wait for user acknowledgment
+        await new Promise(resolve => {
+          Swal.fire({
+            title: "Form submitted successfully!",
+            text: "Thank You!",
+            icon: "success",
+          }).then(() => {
+            resolve();
+          });
+        });
+
+        // Redirect to the home page after the user acknowledges the success message
+        window.location.replace('/');
+      } else {
+        Swal.fire({
+          title: "Please fill in all the details!",
+          icon: "warning",
+        });
+      }
+    } catch (error) {
+      console.error(error);
     }
   };
+
+
+
+
 
   return (
     <>
 
-      <form className=" row g-3 form img" enctype="multipart/form-data">
+      <form className=" row g-3 form" enctype="multipart/form-data">
+      <video className="video" autoPlay loop muted>
+              <source src={cherry} type="video/mp4" />
+            </video>
         <h1 className="text-center">Registration Form</h1>
         <div className="col-md-3">
           <label htmlFor="name" className="form-label required">
@@ -52,9 +102,12 @@ const Career = () => {
             name="name"
             required
             value={formData.name}
+            placeholder="Name"
             onChange={handleChange}
           />
+
         </div>
+
         <div className="col-md-3">
           <label htmlFor="email" className="form-label required">
             Email
@@ -66,6 +119,7 @@ const Career = () => {
             name="email"
             required
             value={formData.email}
+            placeholder="Email"
             onChange={handleChange}
 
           />
@@ -83,6 +137,7 @@ const Career = () => {
             name="phone"
             required
             value={formData.phone}
+            placeholder="Phone No"
             onChange={handleChange}
           />
         </div>
@@ -93,23 +148,24 @@ const Career = () => {
             Gender
           </label>
           <select
-            id="inputPost"
+            id="gender"
             className="form-select"
-            name="Gender"
+            name="gender"
             required
-            value={formData.Gender}
+            value={formData.gender}
             onChange={handleChange}
           >
             <option selected="">Choose...</option>
-            <option selected>Male</option>
-            <option selected>Female</option>
-            <option selected>Other</option>
+            <option selected="Male">Male</option>
+            <option selected="Female">Female</option>
+            <option selected="Other">Other</option>
+
           </select>
         </div>
 
-        <div className="col-9">
+        <div className="col-5">
           <label htmlFor="inputAddress" className="form-label required">
-          Address
+            Address
           </label>
           <input
             type="text"
@@ -124,25 +180,7 @@ const Career = () => {
 
         </div>
 
-
-        {/* <div className="col-9">
-          <label htmlFor="inputAddress" className="form-label">
-            Correspondence Address
-          </label>
-          <input
-            type="text"
-            className="form-control"
-            id="inputAddress"
-            placeholder="Address"
-            name="caddress"
-            value={formData.caddress}
-            onChange={handleChange}
-          />
-
-        </div> */}
-
-
-        <div className="col-6 ">
+        <div className="col-4 ">
           <label htmlFor="inputAddress2" className="form-label required">
             College/University
           </label>
@@ -155,9 +193,9 @@ const Career = () => {
             value={formData.college}
             onChange={handleChange}
           />
-           </div>
+        </div>
 
-          <div className="col-md-4 ">
+        <div className="col-md-4 ">
           <label htmlFor="inputPost" className="form-label required">
             Education
           </label>
@@ -206,13 +244,14 @@ const Career = () => {
             id="phone"
             name="skills"
             required
+            placeholder="Skills"
             value={formData.skills}
             onChange={handleChange}
           />
         </div>
 
-        
-        
+
+
         <div className="col-md-3">
           <label htmlFor="inputState" className="form-label required">
             State
@@ -287,11 +326,11 @@ const Career = () => {
         </div>
 
         <div className="col-md-4">
-          <label htmlFor="inputPost" className="form-label required">
+          <label htmlFor="inputExp" className="form-label required">
             Experience
           </label>
           <select
-            id="inputPost"
+            id="inputExp"
             className="form-select"
             name="experience"
             required
@@ -299,40 +338,46 @@ const Career = () => {
             onChange={handleChange}
           >
             <option selected="">Choose...</option>
-            <option selected>Fresher</option>
             <option selected>0-1</option>
             <option selected>1</option>
             <option selected>2</option>
             <option selected>3</option>
+            <option selected>4</option>
             <option selected>5+</option>
             <option selected>8+</option>
             <option selected>10+</option>
           </select>
         </div>
 
-          
-        {/* <div className="input-group mb-3">
+
+        {/* <div className="col-5 mt-4 mb-4">
+          <label htmlFor="name" className="form-label required">
+            Paste Resume/CV link here
+          </label>
           <input
-            type="file"
+            type="text"
             className="form-control"
-            id="inputGroupFile"
-            name="upload"
-            value={formData.upload}
+            id="uplad"
+            name="Resume"
+            required
+            selected={formData.Resume}
+            placeholder="Paste here"
             onChange={handleChange}
           />
+          
         </div> */}
 
-        <div className="form-floating md-5 col-10">
+        {/* <div className="form-floating md-5 col-10">
           <textarea
             className="form-control"
             placeholder="Leave a comment here"
             id="floatingTextarea"
             name="comment"
-            value={formData.comment}
+            selected={formData.comment}
             onChange={handleChange}
           ></textarea>
           <label htmlFor="floatingTextarea">Any question or query?</label>
-        </div>
+        </div> */}
 
         <div className="col-6">
           <button
@@ -343,6 +388,7 @@ const Career = () => {
             Submit
           </button>
         </div>
+
       </form>
 
     </>
